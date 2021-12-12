@@ -4,7 +4,7 @@ const About = () => {
     const a =useContext(noteContext)
     return (
         <div>
-            About page{a.name}
+            About page{a.name} and sub is {a.sub}
         </div>
     )
 }
