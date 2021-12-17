@@ -3,13 +3,20 @@ import noteContext from "../context/notes/NoteContext";
 import AddNote from "./AddNote";
 import NoteItem from "./NoteItem";
 import React from "react";
+import { useNavigate } from "react-router";
 
-const Notes = () => {
+const Notes = (props) => {
   const context = useContext(noteContext);
+  let navigate=useNavigate()
   const { notes, getNotes,editNote } = context;
 
   useEffect(() => {
-    getNotes();
+    if(localStorage.getItem('token')){
+      getNotes()
+    }
+    else{
+      navigate("/SignIn")
+    }
     // eslint-disable-next-line
   }, []);
   const ref = useRef(null);
@@ -23,6 +30,8 @@ const Notes = () => {
   const handleClick = (e) => {
     editNote(note.id,note.etitle,note.edescription,note.etag)
     refClose.current.click();
+    props.showAlert("Note Updated!","success")
+
   };
 
   const onChange = (e) => {
@@ -32,7 +41,7 @@ const Notes = () => {
 
   return (
     <>
-      <AddNote />
+      <AddNote showAlert={props.showAlert} />
       <button ref={ref} type="button" className="btn btn-primary d-none" data-bs-toggle="modal" data-bs-target="#exampleModal">
       </button>
       
@@ -79,7 +88,7 @@ const Notes = () => {
         {notes.length===0 && 'Add Some Notes!'}
         </div>
         {notes.map((note) => {
-          return (<NoteItem key={note._id} updateNote={updateNote} note={note} />);
+          return (<NoteItem key={note._id} updateNote={updateNote} showAlert={props.showAlert} note={note} />);
         })}
       </div>
 

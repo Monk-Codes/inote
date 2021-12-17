@@ -16,15 +16,16 @@ router.post("/createuser",
     body("password").isLength({ min: 5 }),
   ],
   async (req, res) => {
+    let success = false
     const erorrs = validationResult(req);
     if (!erorrs.isEmpty()) {
-    return res.status(400).json({ erorrs: erorrs.array() });
+    return res.status(400).json({success, erorrs: erorrs.array() });
     }
     // check whether the same email exists already
     try {
       let user = await User.findOne({ email: req.body.email });
       if (user) {
-        return res.status(400).json({ error: "Sorry a user with same email already exists" });
+        return res.status(400).json({success, error: "Sorry a user with same email already exists" });
       }
       const salt = await bcrypt.genSalt(10);
       const secPass = await bcrypt.hash(req.body.password, salt);
@@ -41,7 +42,8 @@ router.post("/createuser",
       };
 
       const authtoken = jwt.sign(data, JWT_SECRET);
-      res.json({ authtoken });
+      success=true
+      res.json({success, authtoken });
     }
     catch (error) {console.error(error.message);
       res.status(500).send("Internal error occured");
